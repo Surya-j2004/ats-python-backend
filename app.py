@@ -1,6 +1,15 @@
 import streamlit as st
 import os
 import re 
+import nltk
+
+try:
+    from nltk.corpus import stopwords
+    stopwords.words('english')
+except LookupError:
+    nltk.download('stopwords')
+    from nltk.corpus import stopwords
+
 
 from parsers.pdf_parser import extract_text_from_pdf
 from parsers.docx_parser import extract_text_from_docx
