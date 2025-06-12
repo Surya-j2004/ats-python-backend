@@ -1,47 +1,34 @@
 import re
-from typing import List, Set
+from nltk.corpus import stopwords
 
-def extract_skills(text: str, skill_list: List[str]) -> List[str]:
-    """
-    Extract skills from text using pattern matching
+STOPWORDS = set(stopwords.words('english'))
+
+EDUCATION = [
+    'BE', 'B.E.', 'B.E', 'BS', 'B.S',
+    'ME', 'M.E', 'M.E.', 'MS', 'M.S',
+    'BTECH', 'B.TECH', 'M.TECH', 'MTECH',
+    'SSC', 'HSC', 'CBSE', 'ICSE', 'X', 'XII',
+    'PHD', 'PH.D', 'MBA', 'BBA', 'BCA', 'MCA',
+    'BSC', 'MSc', 'B.COM', 'M.COM', 'BA', 'MA'
+]
+
+def extract_education(resume_text):
+    lines = resume_text.split('\n')
+    education = []
+
+    for i, line in enumerate(lines):
+        words = line.split()
+        for word in words:
+            word_clean = re.sub(r'[?|$|.|!|,]', r'', word)
+            word_upper = word_clean.upper()
+
+            if word_upper in EDUCATION and word_upper.lower() not in STOPWORDS:
+                combined_line = line
+                if i + 1 < len(lines):
+                    combined_line += ' ' + lines[i + 1]
+
+                year_match = re.search(r'(((20|19)\d{2}))', combined_line)
+                year = year_match.group() if year_match else None
+                education.append((word_upper, year))
     
-    Args:
-        text: Input text to extract skills from
-        skill_list: List of skills to search for
-    
-    Returns:
-        List of found skills
-    """
-    if not text or not skill_list:
-        return []
-    
-    found_skills = set()
-    text_lower = text.lower()
-    
-    for skill in skill_list:
-        skill_lower = skill.lower().strip()
-        
-        # Multiple matching strategies for better accuracy
-        patterns = [
-            # Exact word boundary match
-            r'\b' + re.escape(skill_lower) + r'\b',
-            # With optional 's' for plurals
-            r'\b' + re.escape(skill_lower) + r's?\b',
-            # Handle spaces and variations
-            skill_lower.replace(' ', r'\s+'),
-            # Handle dots in technology names (e.g., Node.js)
-            re.escape(skill_lower).replace(r'\.', r'\.?'),
-        ]
-        
-        for pattern in patterns:
-            try:
-                if re.search(pattern, text_lower, re.IGNORECASE):
-                    found_skills.add(skill)
-                    break
-            except re.error:
-                # Fallback to simple string matching if regex fails
-                if skill_lower in text_lower:
-                    found_skills.add(skill)
-                break
-    
-    return list(found_skills)
+    return education
