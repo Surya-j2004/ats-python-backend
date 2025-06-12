@@ -1,7 +1,7 @@
 streamlit
 pdfplumber
 python-docx
-spacy
+
 scikit-learn
 pandas
 spacy>=3.4.0
