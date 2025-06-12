@@ -1,5 +1,13 @@
 import re
-from nltk.corpus import stopwords
+import nltk
+
+try:
+    from nltk.corpus import stopwords
+    stopwords.words('english')
+except LookupError:
+    nltk.download('stopwords')
+    from nltk.corpus import stopwords
+
 
 STOPWORDS = set(stopwords.words('english'))
 
